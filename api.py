@@ -106,6 +106,7 @@ def delete_errors_route():
     return "", 204
 
 
-if __name__ == "__main__":
-    create_db_table()
-    app.run(host='0.0.0.0', port=8080)
+# if __name__ == "__main__":
+#     create_db_table()
+#     app.run()
+create_db_table()
