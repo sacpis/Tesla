@@ -11,6 +11,7 @@ limiter = RateLimiter(limit=10, interval=10)
 
 DATABASE_PATH = "data.db"
 MAXIMUM_TEMPERATURE = 90.0
+errors = []
 
 app = Flask(__name__)
 
@@ -51,6 +52,9 @@ def delete_errors() -> None:
         """)
 
 
+create_db_table()
+
+
 def parse_data_string(data_string: str) -> dict:
     try:
         device_id, epoch_ms, event_type, temperature = data_string.split(":")
@@ -62,7 +66,7 @@ def parse_data_string(data_string: str) -> dict:
             "temperature": float(temperature)
         }
     except Exception as e:
-        insert_error(data_string)
+        # insert_error(data_string)
         raise ValueError("Invalid data string") from e
 
 
@@ -89,24 +93,26 @@ def post_temperature():
         else:
             return jsonify({"overtemp": False})
     except ValueError as e:
+        errors.append(data_string)
         return jsonify({"error": "bad request"}), 400
 
 
 @app.route("/errors", methods=["GET"])
 @limiter
 def get_errors_route():
-    errors = get_errors()
+    # errors = get_errors()
     return jsonify({"errors": errors})
 
 
 @app.route("/errors", methods=["DELETE"])
 @limiter
 def delete_errors_route():
-    delete_errors()
+    # delete_errors()
+    errors.clear()
     return "", 204
 
 
 # if __name__ == "__main__":
 #     create_db_table()
-#     app.run()
-create_db_table()
+#     app.run(host='0.0.0.0', port=8080)
+    
