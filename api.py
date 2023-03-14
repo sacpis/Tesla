@@ -70,6 +70,11 @@ def is_over_temperature(temperature: float) -> bool:
     return temperature >= MAXIMUM_TEMPERATURE
 
 
+@app.route('/', methods=["GET"])
+def hello_world():
+    return 'Hello, World!'
+
+
 @app.route("/temp", methods=["POST"])
 @limiter
 def post_temperature():
