@@ -7,7 +7,7 @@ from typing import List
 from RateLimiter import RateLimiter
 
 # Allow only limit requests in interval seconds
-limiter = RateLimiter(limit=10, interval=10)
+limiter = RateLimiter(limit=100, interval=10)
 
 DATABASE_PATH = "data.db"
 MAXIMUM_TEMPERATURE = 90.0
