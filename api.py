@@ -7,7 +7,7 @@ from typing import List
 from RateLimiter import RateLimiter
 
 # Allow only limit requests in interval seconds
-limiter = RateLimiter(limit=100, interval=10)
+# limiter = RateLimiter(limit=100, interval=10)
 
 DATABASE_PATH = "data.db"
 MAXIMUM_TEMPERATURE = 90.0
@@ -80,7 +80,6 @@ def hello_world():
 
 
 @app.route("/temp", methods=["POST"])
-@limiter
 def post_temperature():
     try:
         data_string = request.json["data"]
@@ -98,14 +97,12 @@ def post_temperature():
 
 
 @app.route("/errors", methods=["GET"])
-@limiter
 def get_errors_route():
     # errors = get_errors()
     return jsonify({"errors": errors})
 
 
 @app.route("/errors", methods=["DELETE"])
-@limiter
 def delete_errors_route():
     # delete_errors()
     errors.clear()
