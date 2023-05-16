@@ -10,7 +10,8 @@ from RateLimiter import RateLimiter
 # limiter = RateLimiter(limit=100, interval=10)
 
 DATABASE_PATH = "data.db"
-MAXIMUM_TEMPERATURE = 90.0
+# MAXIMUM_TEMPERATURE = 90.0
+maximum_temperature = {}
 errors = []
 
 app = Flask(__name__)
@@ -55,6 +56,14 @@ def delete_errors() -> None:
 create_db_table()
 
 
+'''
+Input request
+{
+    "device_id": "12345",
+    "epoch_ms": "23456",
+    ""
+}
+'''
 def parse_data_string(data_string: str) -> dict:
     try:
         device_id, epoch_ms, event_type, temperature = data_string.split(":")
@@ -70,8 +79,10 @@ def parse_data_string(data_string: str) -> dict:
         raise ValueError("Invalid data string") from e
 
 
-def is_over_temperature(temperature: float) -> bool:
-    return temperature >= MAXIMUM_TEMPERATURE
+def is_over_temperature(device_id: int, temperature: float) -> bool:
+    if device_id in maximum_temperature:
+        return temperature - maximum_temperature[device_id] > 10
+    return False
 
 
 @app.route('/', methods=["GET"])
@@ -86,7 +97,10 @@ def post_temperature():
         data = parse_data_string(data_string)
         device_id = data["device_id"]
         epoch_ms = data["timestamp"]
-        if is_over_temperature(data["temperature"]):
+        temperature = data["temperature"]
+        is_over_temp = is_over_temperature(device_id, temperature)
+        maximum_temperature[device_id] = temperature
+        if is_over_temp:
             formatted_time = datetime.fromtimestamp(epoch_ms / 1000).strftime('%Y/%m/%d %H:%M:%S')
             return jsonify({"overtemp": True, "device_id": device_id, "formatted_time": formatted_time})
         else:
